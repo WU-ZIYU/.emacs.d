@@ -1476,7 +1476,7 @@ Helper function for `yas--save-restriction-and-widen'."
           (when (consp entry)
             (let ((head (car entry)))
               (unless (or (stringp head)
-                          (markerp head)
+                          (integer-or-marker-p head)
                           (integerp head)
                           (symbolp head)
                           (not (integerp (cdr entry))))
@@ -3231,7 +3231,7 @@ Update each field with the result of calling FUN."
   "Return non-nil if SNIPPET hasn't been committed."
   (catch 'live
     (yas--snippet-map-markers (lambda (m)
-                                (if (markerp m) m
+                                (if (integer-or-marker-p m) m
                                   (throw 'live nil)))
                               snippet)
     t))
@@ -3332,7 +3332,7 @@ it defaults to point.  A non-nil, non-buffer position BEG is
 equivalent to a range covering the whole buffer."
   (unless beg
     (setq beg (point)))
-  (cond ((not (or (integerp beg) (markerp beg)))
+  (cond ((not (or (integerp beg) (integer-or-marker-p beg)))
          (setq beg (point-min) end (point-max)))
         ((not end)
          (setq end (1+ beg))))
@@ -3555,7 +3555,7 @@ This renders the snippet as ordinary text."
     (when (and yas-minor-mode
                (or (bound-and-true-p org-edit-src-from-org-mode)
                    (bound-and-true-p org-src--from-org-mode))
-               (markerp
+               (integer-or-marker-p
                 (setq org-marker
                       (or (bound-and-true-p org-edit-src-beg-marker)
                           (bound-and-true-p org-src--beg-marker))))

@@ -7,3 +7,9 @@ recentf
 transient
 tutorial
 games
+.cache
+\#*
+.\#*
+auto-save-list
+racket-mode
+.cache

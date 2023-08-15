@@ -1696,7 +1696,7 @@ Comparison is done with `eq'."
 ;;;             Undo list and undo changeset utility functions
 
 (defmacro undo-list-marker-elt-p (elt)
-  `(markerp (car-safe ,elt)))
+  `(integer-or-marker-p (car-safe ,elt)))
 
 (defmacro undo-list-GCd-marker-elt-p (elt)
   ;; Return t if ELT is a marker element whose marker has been moved to the
@@ -3776,7 +3776,7 @@ Note this will overwrite any existing undo history."
       (undo-tree-move-down 1)
       (setq n (car (undo-tree-node-next node)))
       ;; link next node to its representation in visualizer
-      (unless (markerp (undo-tree-node-marker n))
+      (unless (integer-or-marker-p (undo-tree-node-marker n))
         (setf (undo-tree-node-marker n) (make-marker))
         (set-marker-insertion-type (undo-tree-node-marker n) nil))
       (move-marker (undo-tree-node-marker n) (point))
@@ -3811,7 +3811,7 @@ Note this will overwrite any existing undo history."
           (undo-tree-move-backward 2)
           (undo-tree-move-down 1)
           ;; link node to its representation in visualizer
-          (unless (markerp (undo-tree-node-marker (car n)))
+          (unless (integer-or-marker-p (undo-tree-node-marker (car n)))
             (setf (undo-tree-node-marker (car n)) (make-marker))
             (set-marker-insertion-type (undo-tree-node-marker (car n)) nil))
           (move-marker (undo-tree-node-marker (car n)) (point))
@@ -3835,7 +3835,7 @@ Note this will overwrite any existing undo history."
           (undo-tree-move-backward 1)
           (undo-tree-move-down 1)
           ;; link node to its representation in visualizer
-          (unless (markerp (undo-tree-node-marker (car n)))
+          (unless (integer-or-marker-p (undo-tree-node-marker (car n)))
             (setf (undo-tree-node-marker (car n)) (make-marker))
             (set-marker-insertion-type (undo-tree-node-marker (car n)) nil))
           (move-marker (undo-tree-node-marker (car n)) (point))
@@ -3863,7 +3863,7 @@ Note this will overwrite any existing undo history."
           (undo-tree-insert ?\\)
           (undo-tree-move-down 1)
           ;; link node to its representation in visualizer
-          (unless (markerp (undo-tree-node-marker (car n)))
+          (unless (integer-or-marker-p (undo-tree-node-marker (car n)))
             (setf (undo-tree-node-marker (car n)) (make-marker))
             (set-marker-insertion-type (undo-tree-node-marker (car n)) nil))
           (move-marker (undo-tree-node-marker (car n)) (point))

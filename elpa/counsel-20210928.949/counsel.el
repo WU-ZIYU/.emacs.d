@@ -4219,11 +4219,11 @@ register tied to a mark in the message string."
           (append
            (cl-remove-if (lambda (m)
                            (or (evil-global-marker-p (car m))
-                               (not (markerp (cdr m)))))
+                               (not (integer-or-marker-p (cdr m)))))
                          evil-markers-alist)
            (cl-remove-if (lambda (m)
                            (or (not (evil-global-marker-p (car m)))
-                               (not (markerp (cdr m)))))
+                               (not (integer-or-marker-p (cdr m)))))
                          (default-value 'evil-markers-alist))))
 
          (all-markers
