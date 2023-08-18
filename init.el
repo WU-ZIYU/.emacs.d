@@ -40,13 +40,13 @@
 (setq confirm-kill-emacs #'yes-or-no-p)      ; 在关闭 Emacs 前询问是否确认关闭，防止误触
 (electric-pair-mode t)                       ; 自动补全括号
 (add-hook 'prog-mode-hook #'show-paren-mode) ; 编程模式下，光标在括号上时高亮另一个括号
-(column-number-mode t)                       ; 在 Mode line 上显示列号
+;(column-number-mode t)                       ; 在 Mode line 上显示列号
 (global-auto-revert-mode t)                  ; 当另一程序修改了文件时，让 Emacs 及时刷新 Buffer
 (delete-selection-mode t)                    ; 选中文本后输入文本会替换文本（更符合我们习惯了的其它编辑器的逻辑）
 (setq inhibit-startup-message t)             ; 关闭启动 Emacs 时的欢迎界面
 (setq make-backup-files nil)                 ; 关闭文件自动备份
 (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
-(global-display-line-numbers-mode 1)         ; 在 Window 显示行号
+;(global-display-line-numbers-mode 1)         ; 在 Window 显示行号
 (tool-bar-mode -1)                           ; （熟练后可选）关闭 Tool bar
 (when (display-graphic-p) (toggle-scroll-bar -1)) ; 图形界面时关闭滚动条
 
@@ -148,22 +148,22 @@
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
-(use-package undo-tree
-  :ensure t
-  :init (global-undo-tree-mode)
-  :after hydra
-  :bind ("C-x C-h u" . hydra-undo-tree/body)
-  :hydra (hydra-undo-tree (:hint nil)            ; 使用hydra为undo tree设置快捷键提示
-  "
-  _p_: undo  _n_: redo _s_: save _l_: load   "
-  ("p"   undo-tree-undo)
-  ("n"   undo-tree-redo)
-  ("s"   undo-tree-save-history)
-  ("l"   undo-tree-load-history)
-  ("u"   undo-tree-visualize "visualize" :color blue)
-  ("q"   nil "quit" :color blue))
-  :custom
-  (undo-tree-auto-save-history nil))
+;; (use-package undo-tree
+;;   :ensure t
+;;   :init (global-undo-tree-mode)
+;;   :after hydra
+;;   :bind ("C-x C-h u" . hydra-undo-tree/body)
+;;   :hydra (hydra-undo-tree (:hint nil)            ; 使用hydra为undo tree设置快捷键提示
+;;   "
+;;   _p_: undo  _n_: redo _s_: save _l_: load   "
+;;   ("p"   undo-tree-undo)
+;;   ("n"   undo-tree-redo)
+;;   ("s"   undo-tree-save-history)
+;;   ("l"   undo-tree-load-history)
+;;   ("u"   undo-tree-visualize "visualize" :color blue)
+;;   ("q"   nil "quit" :color blue))
+;;   :custom
+;;   (undo-tree-auto-save-history nil))
 
 (use-package smart-mode-line
   :ensure t
@@ -459,6 +459,29 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 (use-package racket-mode
   :ensure t
   :hook (racket-mode . racket-xp-mode))
+
+;;; python支持
+(use-package python
+  :defer t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python3" . python-mode)
+  :config
+  ;; for debug
+  (require 'dap-python))
+(use-package pyvenv
+  :ensure t
+  :config
+  (setenv "WORKON_HOME" (expand-file-name "/usr/local/Caskroom/miniconda/base/envs"))
+  (setq python-shell-interpreter "python3") ; 更改解释器名字
+  (pyvenv-mode t))
+; python lsp
+(use-package lsp-pyright
+  :ensure t
+  :config
+  :hook
+  (python-mode . (lambda ()
+		  (require 'lsp-pyright)
+		  (lsp-deferred))))
 
 (use-package treemacs-projectile
   :ensure t
