@@ -1,4 +1,4 @@
-;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
+; init.el --- Load the full configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;; This file bootstraps the configuration, which is divided into
@@ -36,6 +36,18 @@
 ;;; require the test module hello-world
 ;(require 'hello)
 
+;;; 快速复制光标所在的单词, 复制一整行
+(require 'copy)
+(global-set-key (kbd "C-c c w") 'copy-cursor-word)
+(global-set-key (kbd "C-c c b") 'backward-copy-word)
+(global-set-key (kbd "C-c c l") 'copy-one-line)
+
+;;; 删除/剪切一整行
+(require 'remove)
+(global-set-key (kbd "C-c r c") ' kill-clipboard-one-line)
+(global-set-key (kbd "C-c r k") 'kill-one-line)
+
+
 ;;; 配置一些功能
 (setq confirm-kill-emacs #'yes-or-no-p)      ; 在关闭 Emacs 前询问是否确认关闭，防止误触
 (electric-pair-mode t)                       ; 自动补全括号
@@ -65,7 +77,7 @@
 (global-set-key (kbd "C-a") 'back-to-indentation)      ; 交换 C-a 和 M-m，C-a 为到缩进后的行首
 (global-set-key (kbd "M-m") 'move-beginning-of-line)   ; 交换 C-a 和 M-m，M-m 为到真正的行首
 (global-set-key (kbd "C-c '") 'comment-or-uncomment-region) ; 为选中的代码加注释/去注释
-
+(global-set-key (kbd "M-z") nil) ; 不需要使用zap to char
 ;; 自定义两个函数
 ;; Faster move cursor
 (defun next-ten-lines()
@@ -148,6 +160,7 @@
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
+;; 存在bug
 ;; (use-package undo-tree
 ;;   :ensure t
 ;;   :init (global-undo-tree-mode)
@@ -283,6 +296,14 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+;;; 获取环境变量, 开启对性能有一定影响
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :ensure f
+  :init
+  (setq exec-path-from-shell-arguments nil)
+  (exec-path-from-shell-initialize))
+
 ;;; 自动补全
 (use-package company
   :ensure t
@@ -331,6 +352,44 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 
 (global-set-key (kbd "M-/") 'hippie-expand)
 
+;;; python支持
+(use-package python
+  :defer t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python3" . python-mode)
+  :config
+  ;; for debug
+  (require 'dap-python))
+(use-package pyvenv
+  :ensure t
+  :config
+  (setenv "WORKON_HOME" (expand-file-name "/usr/local/Caskroom/miniconda/base/envs"))
+  (setq python-shell-interpreter "python3") ; 更改解释器名字
+  (pyvenv-mode t))
+; python lsp
+(use-package lsp-pyright
+  :ensure t
+  :hook
+  (python-mode . (lambda ()
+		  (require 'lsp-pyright)
+		  )))
+
+;;; racket支持
+(use-package racket-mode
+  :ensure t
+  :hook (racket-mode . racket-xp-mode))
+
+(use-package lsp-java
+  :ensure t
+  :hook
+  (java-mode . (lambda () (require 'lsp-java))))
+
+(use-package c++-mode
+  :functions 			; suppress warnings
+  c-toggle-hungry-state
+  :hook
+  (c++-mode . c-toggle-hungry-state))
+
 ;;; lsp: vscode 语言后端服务器，用来进行程序语言处理
 (use-package lsp-mode
   :ensure t
@@ -338,14 +397,25 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l"
 	lsp-file-watch-threshold 500)
+  :defer t
   :hook 
+  (python-mode . lsp)
+  (java-mode . lsp)
+  (c-mode . lsp)
+  (c++-mode . lsp)
   (lsp-mode . lsp-enable-which-key-integration) ; which-key integration
-  :commands (lsp lsp-deferred)
+  :commands lsp
   :config
+  (setq lsp-enable-links nil)
   (setq lsp-completion-provider :none) ;; 阻止 lsp 重新设置 company-backend 而覆盖我们 yasnippet 的设置
   (setq lsp-headerline-breadcrumb-enable t)
   :bind
-  ("C-c l s" . lsp-ivy-workspace-symbol)) ;; 可快速搜索工作区内的符号（类名、函数名、变量名等）
+  ("C-c l s" . lsp-ivy-workspace-symbol) ;; 可快速搜索工作区内的符号（类名、函数名、变量名等）
+  ("C-c l r" . lsp-find-references)
+  ("C-c l d" . lsp-find-definition)
+  ("C-c l e" . lsp-find-declaration)
+  ("C-c l i" . lsp-find-implementation)
+  ("C-c l t" . lsp-find-type-definition))
 
 (use-package lsp-ui
   :ensure t
@@ -426,14 +496,6 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   :after (projectile)
   :init (counsel-projectile-mode))
 
-;;; 获取环境变量, 开启对性能有一定影响
-;(use-package exec-path-from-shell
-;  :if (memq window-system '(mac ns))
-;  :ensure f
-;  :init
-;  (setq exec-path-from-shell-arguments nil)
-;  (exec-path-from-shell-initialize))
-
 ;;; git 插件
 (use-package magit
   :ensure t)
@@ -455,34 +517,6 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   (:map treemacs-mode-map
 	("/" . treemacs-advanced-helpful-hydra)))
 
-;;; racket支持
-(use-package racket-mode
-  :ensure t
-  :hook (racket-mode . racket-xp-mode))
-
-;;; python支持
-(use-package python
-  :defer t
-  :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python3" . python-mode)
-  :config
-  ;; for debug
-  (require 'dap-python))
-(use-package pyvenv
-  :ensure t
-  :config
-  (setenv "WORKON_HOME" (expand-file-name "/usr/local/Caskroom/miniconda/base/envs"))
-  (setq python-shell-interpreter "python3") ; 更改解释器名字
-  (pyvenv-mode t))
-; python lsp
-(use-package lsp-pyright
-  :ensure t
-  :config
-  :hook
-  (python-mode . (lambda ()
-		  (require 'lsp-pyright)
-		  (lsp-deferred))))
-
 (use-package treemacs-projectile
   :ensure t
   :after (treemacs projectile))
@@ -490,6 +524,12 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 (use-package lsp-treemacs
   :ensure t
   :after (treemacs lsp))
+
+;;; google this
+(use-package google-this
+  :ensure t
+  :init
+  (google-this-mode)) 
 
 (provide 'init)
 ;;; init.el ends here

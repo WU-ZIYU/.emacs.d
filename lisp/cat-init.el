@@ -1,4 +1,4 @@
-;;; cat-init -- Echo "Hello, world!"
+;;; cat-init -- print or quickly open init.el
 ;;; Commentary:
 ;;; Code:
 
