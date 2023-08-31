@@ -98,7 +98,8 @@
 ;;; 设置插件的镜像, 添加插件库 melpa
 (require 'package)
 (setq package-archives '(("gnu"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
-                         ("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
+                         ;("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
+			 ("melpa" . "https://melpa.org/packages/")
                          ("elpa" . "http://mirrors.cloud.tencent.com/elpa/elpa/")))
 (package-initialize)
 ; package-list-packages命令用来在M-X中输入package-list-packages来展示仓库下的包	; package-install <packagename> 安装仓库
@@ -531,6 +532,23 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   :init
   (google-this-mode)) 
 
+;;; 图标配置
+(use-package all-the-icons
+  :if (display-graphic-p))
+
+;;; Doom emacs主题
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
+	doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-dracula)
+  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
 (provide 'init)
 ;;; init.el ends here
 (custom-set-variables
@@ -539,9 +557,9 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
+   '("234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
+   '(all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
