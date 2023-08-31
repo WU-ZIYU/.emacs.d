@@ -66,7 +66,9 @@
 ;(setq display-line-numbers-type 'relative)   ; （可选）显示相对行号
 (add-to-list 'default-frame-alist '(width . 90))  ; （可选）设定启动图形界面时的初始 Frame 宽度（字符数）
 (add-to-list 'default-frame-alist '(height . 55)) ; （可选）设定启动图形界面时的初始 Frame 高度（字符数）
-(setq buffer-file-coding-system 'utf-8-nfd-mac)  ; 设置utf8
+(if (eq system-type 'darwin) ; 设置utf8
+  (setq buffer-file-coding-system 'utf-8-nfd-mac)
+  (setq buffer-file-coding-system 'utf-8))
 (setq split-height-threshold nil)  ; 包括下面这行，设置默认横向分割window
 (setq split-width-threshold 0)
 
