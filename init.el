@@ -381,7 +381,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :hook (racket-mode . racket-xp-mode))
 
 (use-package lsp-java
-  :ensure t
+  :ensure nil
   :hook
   (java-mode . (lambda () (require 'lsp-java))))
 
@@ -390,6 +390,33 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   c-toggle-hungry-state
   :hook
   (c++-mode . c-toggle-hungry-state))
+
+;;; roby mode 
+(use-package ruby-mode
+  :ensure nil
+  :hook
+  (ruby-mode . amk-lsp-format-on-save)
+  :ensure-system-package (solargraph . "gem install --user-install solargraph"))
+
+(use-package inf-ruby)
+
+(use-package ruby-test-mode
+  :after ruby-mode
+  :diminish ruby-test-mode
+  :config
+  (defun amk-ruby-test-pretty-error-diffs (old-func &rest args)
+    "Make error diffs prettier."
+    (let ((exit-status (cadr args)))
+      (apply old-func args)
+      (when (> exit-status 0)
+        (diff-mode)
+        ;; Remove self
+        (advice-remove #'compilation-handle-exit #'amk-ruby-test-pretty-error-diffs))))
+  (defun amk-ruby-test-pretty-error-diffs-setup (old-func &rest args)
+    "Set up advice to enable pretty diffs when tests fail."
+    (advice-add #'compilation-handle-exit :around #'amk-ruby-test-pretty-error-diffs)
+    (apply old-func args))
+  (advice-add #'ruby-test-run-command :around #'amk-ruby-test-pretty-error-diffs-setup))
 
 ;;; lsp: vscode 语言后端服务器，用来进行程序语言处理
 (use-package lsp-mode
@@ -404,6 +431,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (java-mode . lsp)
   (c-mode . lsp)
   (c++-mode . lsp)
+  (ruby-mode . lsp)
   (lsp-mode . lsp-enable-which-key-integration) ; which-key integration
   :commands lsp
   :config
@@ -557,7 +585,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
+   '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
    '(all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
