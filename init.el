@@ -100,8 +100,8 @@
 ;;; 设置插件的镜像, 添加插件库 melpa
 (require 'package)
 (setq package-archives '(("gnu"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
-                         ;("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
-			 ("melpa" . "https://melpa.org/packages/")
+                         ("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
+			 ;("melpa" . "https://melpa.org/packages/")
                          ("elpa" . "http://mirrors.cloud.tencent.com/elpa/elpa/")))
 (package-initialize)
 ; package-list-packages命令用来在M-X中输入package-list-packages来展示仓库下的包	; package-install <packagename> 安装仓库
@@ -403,14 +403,17 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :hook
   (c++-mode . c-toggle-hungry-state))
 
-;;; roby mode 
+;;; set up ruby mode
+(defun ruby-mode-variables () nil)
+(use-package inf-ruby)
+(autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+;;; ruby mode 
 (use-package ruby-mode
   :ensure nil
   :hook
-  (ruby-mode . amk-lsp-format-on-save)
+  (ruby-mode . inf-ruby-minor-mode)
+  (compilation-filter . inf-ruby-auto-enter)
   :ensure-system-package (solargraph . "gem install --user-install solargraph"))
-
-(use-package inf-ruby)
 
 (use-package ruby-test-mode
   :after ruby-mode
@@ -609,7 +612,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  '(custom-safe-themes
    '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
+   '(inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
