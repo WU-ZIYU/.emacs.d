@@ -58,7 +58,7 @@
 (setq inhibit-startup-message t)             ; 关闭启动 Emacs 时的欢迎界面
 (setq make-backup-files nil)                 ; 关闭文件自动备份
 (add-hook 'prog-mode-hook #'hs-minor-mode)   ; 编程模式下，可以折叠代码块
-;(global-display-line-numbers-mode 1)         ; 在 Window 显示行号
+(global-display-line-numbers-mode 1)         ; 在 Window 显示行号
 (tool-bar-mode -1)                           ; （熟练后可选）关闭 Tool bar
 (when (display-graphic-p) (toggle-scroll-bar -1)) ; 图形界面时关闭滚动条
 
@@ -195,6 +195,8 @@
 ;;; 展示能够使用的热键
 (use-package which-key
   :ensure t
+  :config
+  (setq which-key-allow-imprecise-window-fit nil)
   :init (which-key-mode))
 
 ;;; Emacs minibuffer 中的选项添加注解的插件
@@ -371,7 +373,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (pyvenv-mode t))
 ; python lsp
 (use-package lsp-pyright
-  :ensure t
+  :after lsp
   :hook
   (python-mode . (lambda ()
 		  (require 'lsp-pyright)
@@ -382,12 +384,20 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :ensure t
   :hook (racket-mode . racket-xp-mode))
 
+(setq lsp-java-maven-download-sources t)
+
 (use-package lsp-java
-  :ensure nil
+  :after lsp
   :hook
   (java-mode . (lambda () (require 'lsp-java))))
 
+(use-package java
+  :ensure nil
+  :after lsp-java
+  :bind (:map java-mode-map ("C-c i" . lsp-java-add-import)))
+
 (use-package c++-mode
+  :after lsp
   :functions 			; suppress warnings
   c-toggle-hungry-state
   :hook
@@ -514,6 +524,10 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
    ("q" nil "quit" :color blue)
    ("Q" dap-disconnect :color red)))
 
+(use-package ag
+  :ensure t
+  :after (counsel-projectile))
+
 ;;; 项目管理
 (use-package projectile
   :ensure t
@@ -578,6 +592,12 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+
+;;; set window by number
+(use-package winum
+  :ensure t
+  :init
+  (winum-mode))
 
 (provide 'init)
 ;;; init.el ends here
