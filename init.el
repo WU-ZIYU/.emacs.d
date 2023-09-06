@@ -1,4 +1,4 @@
-; init.el --- Load the full configuration -*- lexical-binding: t -*-
+;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;; This file bootstraps the configuration, which is divided into
@@ -96,6 +96,9 @@
 (global-set-key (kbd "M-p") 'previous-ten-lines)        ; 光标向上移动 10 行
 (global-set-key (kbd "C-j") nil)
 (global-set-key (kbd "C-j C-k") 'kill-whole-line)   ; 删去光标所在行（在图形界面时可以用 "C-S-<DEL>"，终端常会拦截这个按法)
+
+;;; try to fix https://github.com/justbur/emacs-which-key/issues/130#ref-commit-eb4a6f6
+(setq inhibit-compacting-font-caches nil)
 
 ;;; 设置插件的镜像, 添加插件库 melpa
 (require 'package)
@@ -196,7 +199,8 @@
 (use-package which-key
   :ensure t
   :config
-  (setq which-key-allow-imprecise-window-fit nil)
+  (setq which-key-allow-imprecise-window-fit t)
+  (setq which-key-idle-delay 0.4)
   :init (which-key-mode))
 
 ;;; Emacs minibuffer 中的选项添加注解的插件
@@ -602,8 +606,15 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   :init
   (winum-mode))
 
+;;; set up org-mode
+(use-package org
+  :ensure t
+  :config
+  (setq org-adapt-indentation 'headline-data)
+  :init
+  (org-mode))
+
 (provide 'init)
-;;; init.el ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -612,10 +623,11 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  '(custom-safe-themes
    '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
+   '(zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+;;; init.el ends here
