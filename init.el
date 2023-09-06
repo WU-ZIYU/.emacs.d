@@ -1,4 +1,4 @@
-;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
+;; init.el --- Load the full configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;; This file bootstraps the configuration, which is divided into
@@ -102,10 +102,13 @@
 
 ;;; 设置插件的镜像, 添加插件库 melpa
 (require 'package)
-(setq package-archives '(("gnu"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
-                         ("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
-			 ;("melpa" . "https://melpa.org/packages/")
-                         ("elpa" . "http://mirrors.cloud.tencent.com/elpa/elpa/")))
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+			 ;("gnu"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
+                         ;("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
+			 ("melpa" . "https://melpa.org/packages/")
+                         ;("elpa" . "http://mirrors.cloud.tencent.com/elpa/elpa/")))
+			 ("org" . "http://orgmode.org/elpa/")
+			 ("tromey" . "http://tromey.com/elpa/")))
 (package-initialize)
 ; package-list-packages命令用来在M-X中输入package-list-packages来展示仓库下的包	; package-install <packagename> 安装仓库
 
@@ -594,7 +597,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dracula)
+  (load-theme 'doom-dracula t)
   (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.

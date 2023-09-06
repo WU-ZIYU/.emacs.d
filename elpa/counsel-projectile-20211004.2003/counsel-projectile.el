@@ -4,8 +4,6 @@
 
 ;; Author: Eric Danan
 ;; URL: https://github.com/ericdanan/counsel-projectile
-;; Package-Version: 20211004.2003
-;; Package-Commit: e30150792a96968f55f34638cbfe63eaa30839cc
 ;; Keywords: project, convenience
 ;; Version: 0.3.2
 ;; Package-Requires: ((counsel "0.13.4") (projectile "2.5.0"))
