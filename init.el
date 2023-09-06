@@ -145,7 +145,7 @@
   (counsel-mode 1)
   :config
   (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
+  (setq enable-recursive-minibuffers nil)
   ;; enable this if you want `swiper' to use it
   (setq search-default-mode #'char-fold-to-regexp)
   :bind
@@ -200,10 +200,9 @@
 
 ;;; 展示能够使用的热键
 (use-package which-key
-  :ensure t
   :config
   (setq which-key-allow-imprecise-window-fit t)
-  (setq which-key-idle-delay 0.4)
+  (setq which-key-idle-delay 0.1)
   :init (which-key-mode))
 
 ;;; Emacs minibuffer 中的选项添加注解的插件
@@ -391,6 +390,8 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :ensure t
   :hook (racket-mode . racket-xp-mode))
 
+
+;;; java支持
 (setq lsp-java-maven-download-sources t)
 
 (use-package lsp-java
@@ -410,35 +411,39 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :hook
   (c++-mode . c-toggle-hungry-state))
 
-;;; set up ruby mode
-(defun ruby-mode-variables () nil)
-(use-package inf-ruby)
-(autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
-;;; ruby mode 
-(use-package ruby-mode
-  :ensure nil
-  :hook
-  (ruby-mode . inf-ruby-minor-mode)
-  (compilation-filter . inf-ruby-auto-enter)
-  :ensure-system-package (solargraph . "gem install --user-install solargraph"))
 
-(use-package ruby-test-mode
-  :after ruby-mode
-  :diminish ruby-test-mode
-  :config
-  (defun amk-ruby-test-pretty-error-diffs (old-func &rest args)
-    "Make error diffs prettier."
-    (let ((exit-status (cadr args)))
-      (apply old-func args)
-      (when (> exit-status 0)
-        (diff-mode)
-        ;; Remove self
-        (advice-remove #'compilation-handle-exit #'amk-ruby-test-pretty-error-diffs))))
-  (defun amk-ruby-test-pretty-error-diffs-setup (old-func &rest args)
-    "Set up advice to enable pretty diffs when tests fail."
-    (advice-add #'compilation-handle-exit :around #'amk-ruby-test-pretty-error-diffs)
-    (apply old-func args))
-  (advice-add #'ruby-test-run-command :around #'amk-ruby-test-pretty-error-diffs-setup))
+;;; set up ruby mode, not for macos
+(defun ruby-mode-variables () nil)
+(when (not *is-a-mac*) 
+  (use-package inf-ruby)
+  (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+  ;;; ruby mode 
+  (use-package ruby-mode
+    :ensure nil
+    :hook
+    (ruby-mode . inf-ruby-minor-mode)
+    (compilation-filter . inf-ruby-auto-enter)
+    :ensure-system-package (solargraph . "gem install --user-install solargraph"))
+
+  (use-package ruby-test-mode
+    :after ruby-mode
+    :diminish ruby-test-mode
+    :config
+    (defun amk-ruby-test-pretty-error-diffs (old-func &rest args)
+      "Make error diffs prettier."
+      (let ((exit-status (cadr args)))
+        (apply old-func args)
+        (when (> exit-status 0)
+          (diff-mode)
+          ;; Remove self
+          (advice-remove #'compilation-handle-exit #'amk-ruby-test-pretty-error-diffs))))
+    (defun amk-ruby-test-pretty-error-diffs-setup (old-func &rest args)
+      "Set up advice to enable pretty diffs when tests fail."
+      (advice-add #'compilation-handle-exit :around #'amk-ruby-test-pretty-error-diffs)
+      (apply old-func args))
+    (advice-add #'ruby-test-run-command :around #'amk-ruby-test-pretty-error-diffs-setup))
+    (add-hook 'ruby-mode-hook #'lsp))
+    
 
 ;;; lsp: vscode 语言后端服务器，用来进行程序语言处理
 (use-package lsp-mode
@@ -453,7 +458,6 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (java-mode . lsp)
   (c-mode . lsp)
   (c++-mode . lsp)
-  (ruby-mode . lsp)
   (lsp-mode . lsp-enable-which-key-integration) ; which-key integration
   :commands lsp
   :config
@@ -626,7 +630,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  '(custom-safe-themes
    '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
+   '(changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
