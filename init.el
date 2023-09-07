@@ -551,10 +551,10 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   (setq projectile-mode-line "Projectile")
   (setq projectile-track-known-projects-automatically t))
 
-;(use-package counsel-projectile
-;  :ensure t
-;  :after (projectile)
-;  :init (counsel-projectile-mode))
+(use-package counsel-projectile
+ :ensure t
+ :after (projectile)
+ :init (counsel-projectile-mode))
 
 ;;; git 插件
 (use-package magit
