@@ -80,6 +80,8 @@
 (global-set-key (kbd "M-m") 'move-beginning-of-line)   ; 交换 C-a 和 M-m，M-m 为到真正的行首
 (global-set-key (kbd "C-c '") 'comment-or-uncomment-region) ; 为选中的代码加注释/去注释
 (global-set-key (kbd "M-z") nil) ; 不需要使用zap to char
+(global-set-key (kbd "C-g") 'keyboard-quit)
+
 ;; 自定义两个函数
 ;; Faster move cursor
 (defun next-ten-lines()
@@ -207,10 +209,9 @@
 
 ;;; Emacs minibuffer 中的选项添加注解的插件
 (use-package marginalia
-  :ensure t
   :init (marginalia-mode)
   :bind (:map minibuffer-local-map
-			  ("M-A" . marginalia-cycle)))
+  			  ("M-A" . marginalia-cycle)))
 
 ;;; 在新窗口打开buffer
 (use-package embark
@@ -451,7 +452,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l"
-	lsp-file-watch-threshold 500)
+	lsp-file-watch-threshold 50)
   :defer t
   :hook 
   (python-mode . lsp)
@@ -550,10 +551,10 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   (setq projectile-mode-line "Projectile")
   (setq projectile-track-known-projects-automatically t))
 
-(use-package counsel-projectile
-  :ensure t
-  :after (projectile)
-  :init (counsel-projectile-mode))
+;(use-package counsel-projectile
+;  :ensure t
+;  :after (projectile)
+;  :init (counsel-projectile-mode))
 
 ;;; git 插件
 (use-package magit
