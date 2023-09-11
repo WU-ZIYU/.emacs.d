@@ -36,6 +36,13 @@
 ;;; require the test module hello-world
 ;(require 'hello)
 
+;;; set backup files
+(setq backup-directory-alist
+          `(("." . ,(concat user-emacs-directory "backups"))))
+
+;;; set auto save, (auto-save-visited-mode -1) disable it
+(auto-save-visited-mode)
+
 ;;; 快速复制光标所在的单词, 复制一整行
 (require 'copy)
 (global-set-key (kbd "C-c c w") 'copy-cursor-word)
@@ -393,17 +400,17 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 
 
 ;;; java支持
-(setq lsp-java-maven-download-sources t)
+(setq lsp-java-maven-download-sources nil)
 
 (use-package lsp-java
   :after lsp
   :hook
   (java-mode . (lambda () (require 'lsp-java))))
 
-(use-package java
-  :ensure nil
-  :after lsp-java
-  :bind (:map java-mode-map ("C-c i" . lsp-java-add-import)))
+;; (use-package java
+;;   :ensure t
+;;   :after lsp-java
+;;   :bind (:map java-mode-map ("C-c i" . lsp-java-add-import)))
 
 (use-package c++-mode
   :after lsp
@@ -462,12 +469,13 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (lsp-mode . lsp-enable-which-key-integration) ; which-key integration
   :commands lsp
   :config
+  (setq lsp-enable-file-watchers nil)
   (setq lsp-enable-links nil)
   (setq lsp-completion-provider :none) ;; 阻止 lsp 重新设置 company-backend 而覆盖我们 yasnippet 的设置
   (setq lsp-headerline-breadcrumb-enable t)
   :bind
   ("C-c l s" . lsp-ivy-workspace-symbol) ;; 可快速搜索工作区内的符号（类名、函数名、变量名等）
-  ("C-c l r" . lsp-find-references)
+  ("C-c l f" . lsp-find-references)
   ("C-c l d" . lsp-find-definition)
   ("C-c l e" . lsp-find-declaration)
   ("C-c l i" . lsp-find-implementation)
@@ -631,7 +639,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  '(custom-safe-themes
    '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
+   '(lsp-java changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
