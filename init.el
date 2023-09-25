@@ -451,7 +451,6 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
       (apply old-func args))
     (advice-add #'ruby-test-run-command :around #'amk-ruby-test-pretty-error-diffs-setup))
     (add-hook 'ruby-mode-hook #'lsp))
-    
 
 ;;; lsp: vscode 语言后端服务器，用来进行程序语言处理
 (use-package lsp-mode
@@ -639,7 +638,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  '(custom-safe-themes
    '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(lsp-java changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
+   '(thrift lsp-java changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
