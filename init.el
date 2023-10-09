@@ -87,7 +87,7 @@
 (global-set-key (kbd "M-m") 'move-beginning-of-line)   ; 交换 C-a 和 M-m，M-m 为到真正的行首
 (global-set-key (kbd "C-c '") 'comment-or-uncomment-region) ; 为选中的代码加注释/去注释
 (global-set-key (kbd "M-z") nil) ; 不需要使用zap to char
-(global-set-key (kbd "C-g") 'keyboard-quit)
+(global-set-key (kbd "C-g") 'keyboard-escape-quit)
 
 ;; 自定义两个函数
 ;; Faster move cursor
@@ -100,6 +100,24 @@
   "Move cursor to previous 10 lines."
   (interactive)
   (previous-line 10))
+
+(defun replace-string-through-file(from-string to-string)
+  "Replace from-string with to-string through whole file."
+  (declare
+   (interactive-only
+    "cannot use in lisp programs."))
+  (interactive
+   (let ((common
+	  (query-replace-read-args
+	   "Replace string"
+	   nil)))
+     (list (nth 0 common)
+	   (nth 1 common))))
+  (save-excursion
+    (beginning-of-buffer)
+    (while (search-forward from-string nil t)
+      (replace-match to-string nil t))))
+
 ;; 绑定新的键到快捷键
 (global-set-key (kbd "M-n") 'next-ten-lines)            ; 光标向下移动 10 行
 (global-set-key (kbd "M-p") 'previous-ten-lines)        ; 光标向上移动 10 行
@@ -371,6 +389,13 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 
 (global-set-key (kbd "M-/") 'hippie-expand)
 
+;;; ag: 搜索
+(use-package ag
+  :ensure t)
+
+(use-package wgrep
+  :ensure t)
+
 ;;; python支持
 (use-package python
   :defer t
@@ -626,8 +651,13 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   :ensure t
   :config
   (setq org-adapt-indentation 'headline-data)
+  ;(setq org-startup-indented t)
   :init
   (org-mode))
+
+(with-eval-after-load 'org       
+  ;(setq org-startup-indented t) ; Enable `org-indent-mode' by default
+  (add-hook 'org-mode-hook #'visual-line-mode))
 
 (provide 'init)
 (custom-set-variables
