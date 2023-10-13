@@ -87,7 +87,7 @@
 (global-set-key (kbd "M-m") 'move-beginning-of-line)   ; 交换 C-a 和 M-m，M-m 为到真正的行首
 (global-set-key (kbd "C-c '") 'comment-or-uncomment-region) ; 为选中的代码加注释/去注释
 (global-set-key (kbd "M-z") nil) ; 不需要使用zap to char
-(global-set-key (kbd "C-g") 'keyboard-escape-quit)
+;(global-set-key (kbd "C-g") 'keyboard-escape-quit)
 
 ;; 自定义两个函数
 ;; Faster move cursor
@@ -117,6 +117,16 @@
     (beginning-of-buffer)
     (while (search-forward from-string nil t)
       (replace-match to-string nil t))))
+
+(defun show-file-name ()
+  "Show the full path file name in the minibuffer."
+  (interactive)
+  (message (buffer-file-name)))
+
+(defun copy-file-name ()
+  "Copy the full path file name."
+  (interactive)
+  (kill-new (buffer-file-name)))
 
 ;; 绑定新的键到快捷键
 (global-set-key (kbd "M-n") 'next-ten-lines)            ; 光标向下移动 10 行
@@ -196,23 +206,22 @@
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
-;; 存在bug
-;; (use-package undo-tree
-;;   :ensure t
-;;   :init (global-undo-tree-mode)
-;;   :after hydra
-;;   :bind ("C-x C-h u" . hydra-undo-tree/body)
-;;   :hydra (hydra-undo-tree (:hint nil)            ; 使用hydra为undo tree设置快捷键提示
-;;   "
-;;   _p_: undo  _n_: redo _s_: save _l_: load   "
-;;   ("p"   undo-tree-undo)
-;;   ("n"   undo-tree-redo)
-;;   ("s"   undo-tree-save-history)
-;;   ("l"   undo-tree-load-history)
-;;   ("u"   undo-tree-visualize "visualize" :color blue)
-;;   ("q"   nil "quit" :color blue))
-;;   :custom
-;;   (undo-tree-auto-save-history nil))
+(use-package undo-tree
+  :ensure t
+  :init (global-undo-tree-mode)
+  :after hydra
+  :bind ("C-x C-h u" . hydra-undo-tree/body)
+  :hydra (hydra-undo-tree (:hint nil)            ; 使用hydra为undo tree设置快捷键提示
+  "
+  _p_: undo  _n_: redo _s_: save _l_: load   "
+  ("p"   undo-tree-undo)
+  ("n"   undo-tree-redo)
+  ("s"   undo-tree-save-history)
+  ("l"   undo-tree-load-history)
+  ("u"   undo-tree-visualize "visualize" :color blue)
+  ("q"   nil "quit" :color blue))
+  :custom
+  (undo-tree-auto-save-history nil))
 
 (use-package smart-mode-line
   :ensure t
@@ -491,15 +500,38 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
   (add-hook 'go-mode-hook #'my/go-mode-setup))
 
+;;; rust mode
+(use-package rust-mode
+  :ensure t
+  :functions dap-register-debug-template
+  :bind
+  ("C-c C-c" . rust-run)
+  :config
+  ;; debug
+  (require 'dap-gdb-lldb)
+  (dap-register-debug-template "Rust::LLDB Run Configuration"
+                               (list :type "lldb"
+				     :request "launch"
+			             :name "rust-lldb::Run"
+				     :gdbpath "rust-lldb"
+				     :target nil
+				     :cwd nil)))
+
+(use-package cargo
+  :ensure t
+  :hook
+  (rust-mode . cargo-minor-mode))
+
 ;;; lsp: vscode 语言后端服务器，用来进行程序语言处理
 (use-package lsp-mode
   :ensure t
+  :defer t
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l"
 	lsp-file-watch-threshold 50)
-  :defer t
   :hook
+  (rust-mode . lsp)
   (go-mode . lsp)
   (python-mode . lsp)
   (java-mode . lsp)
@@ -665,7 +697,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 (use-package org
   :ensure t
   :config
-  (setq org-adapt-indentation 'headline-data)
+  ;(setq org-adapt-indentation 'headline-data)
   ;(setq org-startup-indented t)
   :init
   (org-mode))
