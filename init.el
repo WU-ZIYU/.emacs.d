@@ -395,7 +395,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 (use-package ag
   :ensure t)
 
-(use-package wgrep
+(use-package helm-ag
   :ensure t)
 
 ;;; python支持
@@ -423,6 +423,8 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 ;;; racket支持
 (use-package racket-mode
   :ensure t
+  :config
+  (setq racket-show-functions '(racket-show-pseudo-tooltip))
   :hook (racket-mode . racket-xp-mode))
 
 
@@ -479,6 +481,16 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
     (advice-add #'ruby-test-run-command :around #'amk-ruby-test-pretty-error-diffs-setup))
     (add-hook 'ruby-mode-hook #'lsp))
 
+;;; go mode setting
+(use-package go-mode
+  :mode "\\.go\\'"
+  :config
+  (defun my/go-mode-setup ()
+    "Basic Go mode setup."
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'go-mode-hook #'my/go-mode-setup))
+
 ;;; lsp: vscode 语言后端服务器，用来进行程序语言处理
 (use-package lsp-mode
   :ensure t
@@ -487,7 +499,8 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (setq lsp-keymap-prefix "C-c l"
 	lsp-file-watch-threshold 50)
   :defer t
-  :hook 
+  :hook
+  (go-mode . lsp)
   (python-mode . lsp)
   (java-mode . lsp)
   (c-mode . lsp)
