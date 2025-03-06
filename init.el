@@ -1,4 +1,4 @@
-;; init.el --- Load the full configuration -*- lexical-binding: t -*-
+;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 
 ;; This file bootstraps the configuration, which is divided into
@@ -19,6 +19,25 @@
 (defconst *is-a-mac* (eq system-type 'darwin))
 
 (setq make-backup-files nil)
+
+;;; 展示frame名称为文件路径
+(setq frame-title-format
+      (list (format "%s %%S: %%j " (system-name))
+        '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+
+;;; 展示buffer文件名称的函数
+(defun show-file-name ()
+  "Show the full path file name in the minibuffer."
+  (interactive)
+  (message (buffer-file-name)))
+
+;;; copy file path into system clipboard
+(defun copy-buffer-file-name-to-clipboard ()
+  "Copy the current buffer's file name to the clipboard."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (when filename
+      (x-select-text filename))))
 
 (when (eq system-type 'darwin)
   (setq dired-use-ls-dired t
@@ -151,6 +170,15 @@
 
 ;;; 输出init.el的内容
 (require 'cat-init)
+
+(use-package yafolding
+  :ensure t)
+
+;;; thrift compile
+(require 'thrift-exec)
+
+;;; 删除当前buffer的文件
+(require 'utils)
 
 ;;; 安装包管理器use-package
 (eval-when-compile
@@ -407,6 +435,17 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 (use-package helm-ag
   :ensure t)
 
+;;; format支持
+;;(use-package format-all
+;;  :commands format-all-mode
+;;  :hook (prog-mode . format-all-mode)
+;;  :config
+;;  (setq-default format-all-formatters
+;;                '(;;("C"     (astyle "--mode=c"))
+;;                  ;;("Shell" (shfmt "-i" "4" "-ci"))
+;;		  ("Java"  (astyle "--mode=java"))
+;;		  ("Json"  (prettier "--mode=json")))))
+
 ;;; python支持
 (use-package python
   :defer t
@@ -441,9 +480,10 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 (setq lsp-java-maven-download-sources nil)
 
 (use-package lsp-java
-  :after lsp
-  :hook
-  (java-mode . (lambda () (require 'lsp-java))))
+  :ensure t
+  :init
+  (setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java")
+  :config (add-hook 'java-mode-hook 'lsp))
 
 ;; (use-package java
 ;;   :ensure t
@@ -702,9 +742,63 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   :init
   (org-mode))
 
+;;; unfill package
+(use-package unfill
+  :ensure t)
+
+
+;;; tag jump of html
+(use-package tagedit
+  :ensure t)
+
+;;; bind > to sgml close function to close tag 
+(defun my-sgml-insert-gt ()
+  "Inserts a `>' character and calls 
+`my-sgml-close-tag-if-necessary', leaving point where it is."
+  (interactive)
+  (insert ">")
+  (save-excursion (my-sgml-close-tag-if-necessary)))
+
+(defun sgml-close-tag-and-delete-last-character ()
+  (sgml-close-tag)
+  (delete-char -1))
+
+(defun my-sgml-close-tag-if-necessary ()
+  "Calls sgml-close-tag if the tag immediately before point is
+an opening tag that is not followed by a matching closing tag."
+  (when (looking-back "<\\s-*\\([^</> \t\r\n]+\\)[^</>]*>")
+    (let ((tag (match-string 1)))
+      (unless (and (not (sgml-unclosed-tag-p tag))
+           (looking-at (concat "\\s-*<\\s-*/\\s-*" tag "\\s-*>")))
+	(sgml-close-tag-and-delete-last-character)))))
+
+(eval-after-load "sgml-mode"
+  '(define-key sgml-mode-map ">" 'my-sgml-insert-gt))
+
+(use-package web-mode
+  :ensure t
+  :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.js?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode)))
+
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
 (with-eval-after-load 'org       
   ;(setq org-startup-indented t) ; Enable `org-indent-mode' by default
   (add-hook 'org-mode-hook #'visual-line-mode))
+
+(setq native-comp-async-report-warnings-errors nil)
+
+(use-package json-mode
+  :ensure t
+  :defer t)
 
 (provide 'init)
 (custom-set-variables
@@ -715,7 +809,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
  '(custom-safe-themes
    '("944d52450c57b7cbba08f9b3d08095eb7a5541b0ecfb3a0a9ecd4a18f3c28948" "234dbb732ef054b109a9e5ee5b499632c63cc24f7c2383a849815dacc1727cb6" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default))
  '(package-selected-packages
-   '(thrift lsp-java changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck))
+   '(format-all treesit-auto web-mode thrift lsp-java changelog-url exec-path-from-shell zprint-format inf-ruby ruby-test-mode all-the-icons nlinum unicode-escape jade-mode auto-package-update counsel flycheck))
  '(warning-suppress-log-types '(((tar link)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

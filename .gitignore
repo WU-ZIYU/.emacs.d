@@ -22,3 +22,6 @@ racket-mode
 request
 workspace
 elpa
+/projectile.cache
+/eln-cache/
+/tree-sitter/
